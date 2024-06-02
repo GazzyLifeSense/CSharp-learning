@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-Console.CursorVisible = false;
+﻿Console.CursorVisible = false;
 Console.BackgroundColor = ConsoleColor.Red;
 Console.ForegroundColor = ConsoleColor.Yellow;
 Console.Clear();
