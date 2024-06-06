@@ -1,4 +1,6 @@
-﻿namespace FlyingChessGame
+﻿using System.Drawing;
+
+namespace FlyingChessGame
 {
     // 场景类型
     enum E_SceneType
@@ -36,6 +38,9 @@
         public int borderLeft, borderRight, borderTop, borderBottom;
         // 格子数组
         public Cell[] cellArr;
+        public int endCellIndex;
+        // 玩家数组
+        public Player[] playerArr;
 
         public GameWindow(int w, int h, ConsoleColor foregroundColor, ConsoleColor backgroundColor, ConsoleColor borderColor, ConsoleColor selectedForegroundColor, string borderIcon = "■")
         {
@@ -151,6 +156,7 @@
                 }
                 startRow++;
             }
+            endCellIndex = index - 1;
         }
     }
     // 格子结构体
@@ -198,19 +204,20 @@
         }
     }
     // 玩家结构体
-    struct Player
+    class Player
     {
         public E_PlayerType type;
-        public int x, y;
+        public int x, y, index;
         public ConsoleColor color;
         public string? icon, desc;
         public bool skip;
 
-        public Player(E_PlayerType type, int x = 0, int y = 0)
+        public Player(E_PlayerType type, int x = 0, int y = 0, int index = 0)
         {
             this.type = type;
             this.x = x;
             this.y = y;
+            this.index = index;
 
             switch (type)
             {
@@ -226,11 +233,40 @@
                     break;
             }
         }
-
         public void draw()
+        {
+            draw(x, y, index);
+        }
+        // 逐格飞行
+        public void draw(GameWindow gw, int index)
+        {
+            int point = index - this.index;
+            index = index > gw.endCellIndex ? gw.endCellIndex : index;
+            for (int i = this.index; i < index; i++)
+            {
+                Thread.Sleep(30);
+                Cell targetCell = gw.cellArr[i + 1];
+                // 绘制玩家到目标格子
+                draw(targetCell.x, targetCell.y, i + 1);
+                // 若当前格子空闲 -》 将格子重绘
+                Player[] ps = gw.playerArr.Where((Player p) => p.index == i).ToArray();
+                if (ps.Length == 0)
+                {
+                    gw.cellArr[i].draw();
+                }
+                else
+                {
+                    ps[0].draw();
+                }
+            }
+        }
+        public void draw(int x, int y, int index)
         {
             if (!skip)
             {
+                this.x = x;
+                this.y = y;
+                this.index = index;
                 Console.ForegroundColor = color;
                 Console.SetCursorPosition(x, y);
                 Console.Write(icon);
@@ -242,7 +278,6 @@
         // 初始化窗口
         static GameWindow gw = new GameWindow(50, 30, ConsoleColor.White, ConsoleColor.Black, ConsoleColor.Red, ConsoleColor.Red);
         static E_SceneType currentSceneType = E_SceneType.StartMenu;
-        static string endInfo = "";
 
         static void Main(string[] args)
         {
@@ -277,11 +312,11 @@
                 bool breakWhile = false;
 
                 Console.ForegroundColor = func % 2 == 0 ? gw.foregroundColor : gw.selectedForegroundColor;
-                Console.SetCursorPosition(gw.w / 2 - 4, 6);
+                Console.SetCursorPosition(gw.w / 2 - 4, 10);
                 Console.Write("开始游戏");
 
                 Console.ForegroundColor = func % 2 == 0 ? gw.selectedForegroundColor : gw.foregroundColor;
-                Console.SetCursorPosition(gw.w / 2 - 4, 8);
+                Console.SetCursorPosition(gw.w / 2 - 4, 12);
                 Console.Write("退出游戏");
 
                 char? opt = Console.ReadKey(true).KeyChar;
@@ -306,19 +341,71 @@
 
         static void startGame()
         {
+            Player? winner = null;
+
             gw.drawBorder();
             gw.drawDesc();
             gw.drawCell();
-            Player local = new Player(E_PlayerType.Local, 0, 0);
-            Player bot = new Player(E_PlayerType.Bot, 0, 0);
-            Console.ReadLine();
+
+            Player local = new Player(E_PlayerType.Local, gw.cellArr[0].x, gw.cellArr[0].y, 0);
+            Player bot = new Player(E_PlayerType.Bot, gw.cellArr[0].x, gw.cellArr[0].y, 0);
+            local.draw();
+            bot.draw();
+            gw.playerArr = [local, bot];
+
+            while(winner == null)
+            {
+                bool breakFor = false;
+                for (int i = 0; i <= gw.playerArr.Length - 1 && !breakFor;)
+                {
+                    char? key = Console.ReadKey(true).KeyChar;
+                    switch(key)
+                    {
+                        case 'j':
+                        case 'J':
+                            Player curPlayer = gw.playerArr[i];
+                            int dice = new Random().Next(1, 7);
+                            int targetIndex = dice + curPlayer.index;
+                            Console.ForegroundColor = curPlayer.color;
+                            Console.SetCursorPosition(gw.borderLeft + 2, gw.h - 5);
+                            if (curPlayer.skip)
+                            {
+                                curPlayer.skip = false;
+                                Console.Write($"{curPlayer.desc}跳过本轮行动...".PadRight(30));
+                                break;
+                            }
+                            Console.Write($"{curPlayer.desc}投掷点数为：{dice}".PadRight(30));
+                            
+                            if (targetIndex < gw.endCellIndex)
+                            {
+                                curPlayer.draw(gw, targetIndex);
+                            }
+                            else
+                            {
+                                curPlayer.draw(gw, targetIndex);
+                                winner = curPlayer;
+                                breakFor = true;
+                            }
+                            i++;
+                            break;
+                    }
+                }
+                if (winner != null)
+                {
+                    Console.ForegroundColor = winner.color;
+                    Console.SetCursorPosition(gw.borderLeft + 2, gw.h - 3);
+                    Console.Write($"{winner.desc}赢得了比赛！ 按任意键继续...");
+                    Console.ReadKey(true);
+                    currentSceneType = E_SceneType.EndMenu;
+                }
+            }
         }
 
         static void drawEndMenu()
         {
             Console.ForegroundColor = gw.foregroundColor;
             Console.SetCursorPosition(gw.w / 2 - 4, 4);
-            Console.Write(endInfo);
+            Console.Write("游戏结束");
 
             int func = 1;
             while (true)
@@ -326,11 +413,11 @@
                 bool breakWhile = false;
 
                 Console.ForegroundColor = func % 2 == 0 ? gw.foregroundColor : gw.selectedForegroundColor;
-                Console.SetCursorPosition(gw.w / 2 - 4, 6);
+                Console.SetCursorPosition(gw.w / 2 - 4, 10);
                 Console.Write("再玩一次");
 
                 Console.ForegroundColor = func % 2 == 0 ? gw.selectedForegroundColor : gw.foregroundColor;
-                Console.SetCursorPosition(gw.w / 2 - 4, 8);
+                Console.SetCursorPosition(gw.w / 2 - 4, 12);
                 Console.Write("退出游戏");
 
                 char? opt = Console.ReadKey(true).KeyChar;
