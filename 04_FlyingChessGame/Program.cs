@@ -141,7 +141,15 @@ namespace FlyingChessGame
                         startColumn < endColumn ? i <= endColumn : i >= endColumn;
                         i = startColumn < endColumn ? i + 1 : i - 1)
                 {
-                    Cell cell = new Cell(E_CellType.Normal, borderLeft + i * 2, startRow);
+                    // 随机格子类型
+                    int randomType = new Random().Next(1, 16);
+                    E_CellType cellType;
+                    if(randomType < 13){ cellType = E_CellType.Normal; }
+                    else if(randomType < 14) { cellType = E_CellType.RoadBlock; }
+                    else if(randomType < 15) { cellType = E_CellType.Bomb; }
+                    else { cellType = E_CellType.Tunnel; }
+
+                    Cell cell = new Cell(cellType, borderLeft + i * 2, startRow);
                     cellArr[index++] = cell;
                     cell.draw();
                 }
