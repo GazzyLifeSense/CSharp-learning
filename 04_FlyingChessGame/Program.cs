@@ -35,7 +35,7 @@ namespace FlyingChessGame
         // 地图墙体
         public string borderIcon;
         // 地图活动边界
-        public int borderLeft, borderRight, borderTop, borderBottom;
+        public int borderLeft, borderRight, borderTop, borderBottom, maxCharLength;
         // 格子数组
         public Cell[] cellArr;
         public int endCellIndex;
@@ -63,6 +63,7 @@ namespace FlyingChessGame
             borderRight = w - 2;
             borderTop = 0;
             borderBottom = h - 11;
+            maxCharLength = (borderRight - borderLeft - 2) / 2;
             cellArr = new Cell[w * h];
         }
 
@@ -262,24 +263,23 @@ namespace FlyingChessGame
                 if (ps.Length == 0){ gw.cellArr[i].draw(); }
                 else{ ps[0].draw(); }
             }
-
             Console.ForegroundColor = this.color;
             Console.SetCursorPosition(gw.borderLeft + 2, gw.h - 4);
             switch (finalTarget.type)
             {
                 case E_CellType.Normal:
-                    Console.Write($"{this.desc}未触发事件。".PadRight(42));
+                    Console.Write($"{this.desc}未触发事件。".PadRight(gw.maxCharLength));
                     break;
                 case E_CellType.RoadBlock:
-                    Console.Write($"{this.desc}触发事件: 路障，跳过下一回合。".PadRight(42));
+                    Console.Write($"{this.desc}触发事件: 路障，跳过下一回合。".PadRight(gw.maxCharLength));
                     this.skip = true;
                     break;
                 case E_CellType.Bomb:
-                    Console.Write($"{this.desc}触发事件: 炸弹，返回起点。".PadRight(42));
+                    Console.Write($"{this.desc}触发事件: 炸弹，返回起点。".PadRight(gw.maxCharLength));
                     draw(gw.cellArr[0].x, gw.cellArr[0].y, 0);
                     break;
                 case E_CellType.Tunnel:
-                    Console.Write($"{this.desc}触发事件: 隧道，随机传送到任意隧道。".PadRight(42));
+                    Console.Write($"{this.desc}触发事件: 隧道，随机传送到任意隧道。".PadRight(gw.maxCharLength));
                     Cell[] tunnelCells = gw.cellArr.Where(c => c.type == E_CellType.Tunnel).ToArray();
                     int tunnelIndex = new Random().Next(0, tunnelCells.Length);
                     draw(tunnelCells[tunnelIndex].x, tunnelCells[tunnelIndex].y, gw.cellArr.ToList().IndexOf(tunnelCells[tunnelIndex])); 
@@ -306,7 +306,7 @@ namespace FlyingChessGame
     class Program
     { 
         // 初始化窗口
-        static GameWindow gw = new GameWindow(50, 30, ConsoleColor.White, ConsoleColor.Black, ConsoleColor.Red, ConsoleColor.Red);
+        static GameWindow gw = new GameWindow(60, 30, ConsoleColor.White, ConsoleColor.Black, ConsoleColor.Red, ConsoleColor.Red);
         static E_SceneType currentSceneType = E_SceneType.StartMenu;
 
         static void Main(string[] args)
@@ -402,14 +402,14 @@ namespace FlyingChessGame
                             if (curPlayer.skip)
                             {
                                 curPlayer.skip = false;
-                                Console.Write($"{curPlayer.desc}跳过本轮行动...".PadRight(26));
+                                Console.Write($"{curPlayer.desc}跳过本轮行动...".PadRight(gw.maxCharLength));
                                 Console.SetCursorPosition(gw.borderLeft + 2, gw.h - 4);
                                 Console.Write(" ".PadRight(26));
                             }
                             // 正常回合
                             else
                             {
-                                Console.Write($"{curPlayer.desc}投掷点数为：{dice}".PadRight(26));
+                                Console.Write($"{curPlayer.desc}投掷点数为：{dice}".PadRight(gw.maxCharLength));
 
                                 if (targetIndex < gw.endCellIndex)
                                 {
