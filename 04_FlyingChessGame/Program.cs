@@ -249,8 +249,9 @@ namespace FlyingChessGame
         public void draw(GameWindow gw, int index)
         {
             int point = index - this.index;
-            index = index > gw.endCellIndex ? gw.endCellIndex : index;
-            for (int i = this.index; i < index; i++)
+            int finalIndex = index > gw.endCellIndex ? gw.endCellIndex : index;
+            Cell finalTarget = gw.cellArr[finalIndex];
+            for (int i = this.index; i < finalIndex; i++)
             {
                 Thread.Sleep(30);
                 Cell targetCell = gw.cellArr[i + 1];
@@ -258,27 +259,48 @@ namespace FlyingChessGame
                 draw(targetCell.x, targetCell.y, i + 1);
                 // 若当前格子空闲 -》 将格子重绘
                 Player[] ps = gw.playerArr.Where((Player p) => p.index == i).ToArray();
-                if (ps.Length == 0)
-                {
-                    gw.cellArr[i].draw();
-                }
-                else
-                {
-                    ps[0].draw();
-                }
+                if (ps.Length == 0){ gw.cellArr[i].draw(); }
+                else{ ps[0].draw(); }
+            }
+
+            Console.ForegroundColor = this.color;
+            Console.SetCursorPosition(gw.borderLeft + 2, gw.h - 4);
+            switch (finalTarget.type)
+            {
+                case E_CellType.Normal:
+                    Console.Write($"{this.desc}未触发事件。".PadRight(42));
+                    break;
+                case E_CellType.RoadBlock:
+                    Console.Write($"{this.desc}触发事件: 路障，跳过下一回合。".PadRight(42));
+                    this.skip = true;
+                    break;
+                case E_CellType.Bomb:
+                    Console.Write($"{this.desc}触发事件: 炸弹，返回起点。".PadRight(42));
+                    draw(gw.cellArr[0].x, gw.cellArr[0].y, 0);
+                    break;
+                case E_CellType.Tunnel:
+                    Console.Write($"{this.desc}触发事件: 隧道，随机传送到任意隧道。".PadRight(42));
+                    Cell[] tunnelCells = gw.cellArr.Where(c => c.type == E_CellType.Tunnel).ToArray();
+                    int tunnelIndex = new Random().Next(0, tunnelCells.Length);
+                    draw(tunnelCells[tunnelIndex].x, tunnelCells[tunnelIndex].y, gw.cellArr.ToList().IndexOf(tunnelCells[tunnelIndex])); 
+                    break;
+            }
+            // 重绘
+            if(finalTarget.type != E_CellType.Normal)
+            {
+                Player[] ps = gw.playerArr.Where((Player p) => p.index == finalIndex).ToArray();
+                if (ps.Length == 0){ gw.cellArr[finalIndex].draw(); }
+                else{ ps[0].draw(); }
             }
         }
         public void draw(int x, int y, int index)
         {
-            if (!skip)
-            {
                 this.x = x;
                 this.y = y;
                 this.index = index;
-                Console.ForegroundColor = color;
+                Console.ForegroundColor = this.color;
                 Console.SetCursorPosition(x, y);
                 Console.Write(icon);
-            }
         }
     }
     class Program
@@ -376,24 +398,31 @@ namespace FlyingChessGame
                             int targetIndex = dice + curPlayer.index;
                             Console.ForegroundColor = curPlayer.color;
                             Console.SetCursorPosition(gw.borderLeft + 2, gw.h - 5);
+                            // 跳过回合
                             if (curPlayer.skip)
                             {
                                 curPlayer.skip = false;
-                                Console.Write($"{curPlayer.desc}跳过本轮行动...".PadRight(30));
-                                break;
+                                Console.Write($"{curPlayer.desc}跳过本轮行动...".PadRight(26));
+                                Console.SetCursorPosition(gw.borderLeft + 2, gw.h - 4);
+                                Console.Write(" ".PadRight(26));
                             }
-                            Console.Write($"{curPlayer.desc}投掷点数为：{dice}".PadRight(30));
-                            
-                            if (targetIndex < gw.endCellIndex)
-                            {
-                                curPlayer.draw(gw, targetIndex);
-                            }
+                            // 正常回合
                             else
                             {
-                                curPlayer.draw(gw, targetIndex);
-                                winner = curPlayer;
-                                breakFor = true;
+                                Console.Write($"{curPlayer.desc}投掷点数为：{dice}".PadRight(26));
+
+                                if (targetIndex < gw.endCellIndex)
+                                {
+                                    curPlayer.draw(gw, targetIndex);
+                                }
+                                else
+                                {
+                                    curPlayer.draw(gw, targetIndex);
+                                    winner = curPlayer;
+                                    breakFor = true;
+                                }
                             }
+                       
                             i++;
                             break;
                     }
