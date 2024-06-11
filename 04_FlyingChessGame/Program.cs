@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace FlyingChessGame
+﻿namespace FlyingChessGame
 {
     // 场景类型
     enum E_SceneType
