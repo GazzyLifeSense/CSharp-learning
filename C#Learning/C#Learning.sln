@@ -9,11 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "01_IO", "..\01_IO\01_IO.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "02_Random", "..\02_Random\02_Random.csproj", "{50FE0B62-72AA-4FB2-B309-F624197F8AA9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "03_Game", "..\03_Game\03_Game.csproj", "{9481565A-BCB5-4C05-87C1-137CB6E197D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "03_SavePrincessGame", "..\03_Game\03_SavePrincessGame.csproj", "{9481565A-BCB5-4C05-87C1-137CB6E197D6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "04_FlyingChessGame", "..\04_FlyingChessGame\04_FlyingChessGame.csproj", "{99A76579-EAA0-4CDA-B7EE-CD3BBA4986EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "05_OperatorReload", "..\05_OperatorReload\05_OperatorReload.csproj", "{4C656032-FB3D-456A-9219-F061CBF131B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "05_OperatorReload", "..\05_OperatorReload\05_OperatorReload.csproj", "{4C656032-FB3D-456A-9219-F061CBF131B4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "06_SnakeGame", "..\06_SnakeGame\06_SnakeGame.csproj", "{27344D0A-D68C-4018-B450-73537E1DD7E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{4C656032-FB3D-456A-9219-F061CBF131B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C656032-FB3D-456A-9219-F061CBF131B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C656032-FB3D-456A-9219-F061CBF131B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27344D0A-D68C-4018-B450-73537E1DD7E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27344D0A-D68C-4018-B450-73537E1DD7E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27344D0A-D68C-4018-B450-73537E1DD7E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27344D0A-D68C-4018-B450-73537E1DD7E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
