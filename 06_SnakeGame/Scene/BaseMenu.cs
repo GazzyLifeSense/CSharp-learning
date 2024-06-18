@@ -17,11 +17,11 @@
             Console.SetCursorPosition(Console.BufferWidth / 2 - 3, 4);
             Console.Write(title);
 
-            Console.ForegroundColor = optIndex % 2 == 0 ? ConsoleColor.White : ConsoleColor.Red;
+            Console.ForegroundColor = optIndex % 2 == 0 ? ConsoleColor.Red : ConsoleColor.White;
             Console.SetCursorPosition(Console.BufferWidth / 2 - 4, 10);
             Console.Write(optionOne);
 
-            Console.ForegroundColor = optIndex % 2 == 0 ? ConsoleColor.Red : ConsoleColor.White;
+            Console.ForegroundColor = optIndex % 2 == 0 ? ConsoleColor.White : ConsoleColor.Red;
             Console.SetCursorPosition(Console.BufferWidth / 2 - 4, 12);
             Console.Write(optionTwo);
 

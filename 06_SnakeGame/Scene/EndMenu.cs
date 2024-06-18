@@ -2,7 +2,7 @@
 {
     internal class EndMenu : BaseMenu
     {
-        public EndMenu(): base("结束游戏", "再玩一次", "退出游戏")
+        public EndMenu(): base("游戏结束", "再玩一次", "退出游戏")
         {
         }
 
